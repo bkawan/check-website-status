@@ -1,6 +1,7 @@
-import sqlite3
-import requests
 import json
+import sqlite3
+
+import requests
 
 template = '''<!DOCTYPE html>
 <html>
@@ -10,7 +11,8 @@ template = '''<!DOCTYPE html>
 </head>
 <body>
 <p>
-Hello {},
+Hello <strong> {}</strong>,
+<br>
 <br>
 Below is the detail of your property.
 </p>
@@ -23,6 +25,13 @@ Below is the detail of your property.
   </tr>
   {}
 </table>
+
+<br>
+<br>
+--- 
+
+Thank you 
+
 </body>
 </html>
 
@@ -46,7 +55,7 @@ conn = sqlite3.connect('web.db')
 c = conn.cursor()
 c.execute('SELECT * FROM website ORDER BY id')
 rows = c.fetchall()
-all_rows = ''
+all_table_rows = ''
 
 
 def check_website_status_and_load_time(url):
@@ -54,7 +63,7 @@ def check_website_status_and_load_time(url):
     status_code = response.status_code
     load_time = response.elapsed.total_seconds()
     return {
-        'status':status_code,
+        'status':'Active' if status_code == 200 else 'Down',
         'load_time':load_time
     }
 
@@ -85,7 +94,7 @@ def send_email(recp, subject, body):
         server.sendmail(gmail_sender, [TO], msg.as_string())
         print('email sent to {}'.format(recp))
     except:
-        print('error sending mail'.format(recp))
+        print('error sending mail to '.format(recp))
     server.quit()
 
 
@@ -99,10 +108,10 @@ if __name__ == "__main__":
         load_time = status_and_load_time['load_time']
         subject = 'Website status and load time for {} '.format(website)
         _table_row = table_row.format(website, status, load_time)
-        all_rows += _table_row
+        all_table_rows += _table_row
         body = template.format(style, manager_email, _table_row)
         send_email(manager_email, subject, body)
 
     # Send Email to admins
     for email in admin_emails:
-        send_email(email, 'All Website Status', template.format(style, email, all_rows))
+        send_email(email, 'All Website Status', template.format(style, email, all_table_rows))
