@@ -1,0 +1,10 @@
+{
+  'admin_emails': [
+    'example@gmail.com',
+    'exampl2@gmail.com'
+  ],
+  'gmail': {
+    'email': 'email@gmail.com',
+    'password': 'password'
+  }
+}

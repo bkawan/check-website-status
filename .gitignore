@@ -101,3 +101,4 @@ ENV/
 .mypy_cache/
 notebook/
 .idea/
+config.json

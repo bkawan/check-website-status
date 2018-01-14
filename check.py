@@ -1,6 +1,6 @@
 import sqlite3
-
 import requests
+import json
 
 template = '''<!DOCTYPE html>
 <html>
@@ -40,7 +40,8 @@ style = '''table { border-collapse: collapse; }
 table th { background-color: #C6E0B4; }
 table th, table td { padding: 5px; border:1px solid black}'''
 
-admin_emails = ['bikeshkawang@gmail.com', 'lipipoint@gmail.com']
+config = json.load(open('config.json'))
+admin_emails = config['admin_emails']
 conn = sqlite3.connect('web.db')
 c = conn.cursor()
 c.execute('SELECT * FROM website ORDER BY id')
@@ -66,8 +67,8 @@ def send_email(recp, subject, body):
     from email.mime.multipart import MIMEMultipart
     TO = recp
     # Gmail Sign In
-    gmail_sender = 'gmail'
-    gmail_passwd = 'password'
+    gmail_sender = config['gmail']['email']
+    gmail_passwd = config['gmail']['password']
     # Create message container - the correct MIME type is multipart/alternative.
     msg = MIMEMultipart('alternative')
     msg['Subject'] = subject
