@@ -1,10 +1,12 @@
 {
-  'admin_emails': [
-    'example@gmail.com',
-    'exampl2@gmail.com'
+  "admin_emails": [
+    "admin@gmail.com",
+    "admin@gmail.com"
   ],
-  'gmail': {
-    'email': 'email@gmail.com',
-    'password': 'password'
-  }
+  "gmail": {
+    "email": "sender@gmail.com",
+    "password": "password",
+    "from": "from title"
+  },
+  "sqlite": "web.db"
 }
