@@ -81,11 +81,11 @@ def send_email(recp, subject, body):
     # Create message container - the correct MIME type is multipart/alternative.
     msg = MIMEMultipart('alternative')
     msg['Subject'] = subject
-    msg['From'] = gmail_sender
+    author = formataddr((str(Header(u'{}', 'utf-8')).format(config['gmail']['from']),gmail_sender))
+    msg['From'] =author
     msg['To'] = TO
     body = MIMEText(body, 'html')
     msg.attach(body)
-    author = formataddr((str(Header(u'{}', 'utf-8')), gmail_sender))
     server = smtplib.SMTP('smtp.gmail.com', 587)
     server.ehlo()
     server.starttls()
