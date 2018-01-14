@@ -51,9 +51,12 @@ table th, table td { padding: 5px; border:1px solid black}'''
 
 config = json.load(open('config.json'))
 admin_emails = config['admin_emails']
-conn = sqlite3.connect('web.db')
+
+conn = sqlite3.connect(config['database']['name'])
+conn.row_factory = sqlite3.Row
 c = conn.cursor()
-c.execute('SELECT * FROM website ORDER BY id')
+sql = "SELECT * FROM {}".format(config['database']['table_name'])
+c.execute(sql)
 rows = c.fetchall()
 all_table_rows = ''
 
@@ -72,6 +75,7 @@ def check_website_status_and_load_time(url):
         'load_time':load_time
     }
 
+
 def send_email(recp, subject, body):
     import smtplib
     from email.header import Header
@@ -85,8 +89,8 @@ def send_email(recp, subject, body):
     # Create message container - the correct MIME type is multipart/alternative.
     msg = MIMEMultipart('alternative')
     msg['Subject'] = subject
-    author = formataddr((str(Header(u'{}', 'utf-8')).format(config['gmail']['from']),gmail_sender))
-    msg['From'] =author
+    author = formataddr((str(Header(u'{}', 'utf-8')).format(config['gmail']['from']), gmail_sender))
+    msg['From'] = author
     msg['To'] = TO
     body = MIMEText(body, 'html')
     msg.attach(body)
@@ -105,8 +109,8 @@ def send_email(recp, subject, body):
 if __name__ == "__main__":
 
     for row in rows:
-        website = row[1]
-        manager_email = row[2]
+        website = row[config['database']['website_column_name']]
+        manager_email = row[config['database']['manager_email_column_name']]
         status_and_load_time = check_website_status_and_load_time(website)
         status = status_and_load_time['status']
         load_time = status_and_load_time['load_time']
@@ -118,4 +122,5 @@ if __name__ == "__main__":
 
     # Send Email to admins
     for email in admin_emails:
+        print("Sending Email to admin")
         send_email(email, 'All Website Status', template.format(style, email, all_table_rows))

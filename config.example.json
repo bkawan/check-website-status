@@ -8,5 +8,10 @@
     "password": "password",
     "from": "from title"
   },
-  "sqlite": "web.db"
+  "database": {
+    "name": "web.db",
+    "table_name": "website",
+    "manager_email_column_name": "manager_email",
+    "website_column_name": "website_url"
+  }
 }
