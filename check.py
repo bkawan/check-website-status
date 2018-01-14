@@ -59,14 +59,18 @@ all_table_rows = ''
 
 
 def check_website_status_and_load_time(url):
-    response = requests.get(url)
-    status_code = response.status_code
-    load_time = response.elapsed.total_seconds()
+    try:
+        response = requests.get(url)
+        status_code = response.status_code
+        load_time = response.elapsed.total_seconds()
+    except:
+        status_code = 'Down',
+        load_time = 'Unknown'
+
     return {
         'status':'Active' if status_code == 200 else 'Down',
         'load_time':load_time
     }
-
 
 def send_email(recp, subject, body):
     import smtplib
