@@ -3,7 +3,7 @@
 ##### Check Website status from sqlite database and Send email to the admin and website owner about status of website
 
 ### Requirements
-``` python  or python 2```
+``` python 3  or python 2```
 
 ### Dependency 
     pip install requirements.txt

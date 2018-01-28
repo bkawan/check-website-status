@@ -102,3 +102,4 @@ ENV/
 notebook/
 .idea/
 config.json
+web.sqlite3
