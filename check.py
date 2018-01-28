@@ -1,5 +1,6 @@
 import json
 import sqlite3
+from email.mime.image import MIMEImage
 
 import requests
 
@@ -28,9 +29,17 @@ Below is the detail of your property.
 
 <br>
 <br>
---- 
 
-Thank you 
+---------------
+<br>
+<p>Thank You</p>
+<br>
+
+<p>Regards</p>
+<br>
+<img src="cid:{}" style="width:64px;height:64px;">
+
+<p>{}</p>
 
 </body>
 </html>
@@ -51,7 +60,8 @@ table th, table td { padding: 5px; border:1px solid black}'''
 
 config = json.load(open('config.json'))
 admin_emails = config['admin_emails']
-
+logo = config['logo']
+company_name = config['company_name']
 conn = sqlite3.connect(config['database']['name'])
 conn.row_factory = sqlite3.Row
 c = conn.cursor()
@@ -83,6 +93,7 @@ def send_email(recp, subject, body):
     from email.mime.text import MIMEText
     from email.mime.multipart import MIMEMultipart
     TO = recp
+
     # Gmail Sign In
     gmail_sender = config['gmail']['email']
     gmail_passwd = config['gmail']['password']
@@ -94,6 +105,11 @@ def send_email(recp, subject, body):
     msg['To'] = TO
     body = MIMEText(body, 'html')
     msg.attach(body)
+    fp = open(logo, 'rb')
+    img = MIMEImage(fp.read())
+    fp.close()
+    img.add_header('Content-ID', '<{}>'.format(logo))
+    msg.attach(img)
     server = smtplib.SMTP('smtp.gmail.com', 587)
     server.ehlo()
     server.starttls()
@@ -109,18 +125,21 @@ def send_email(recp, subject, body):
 if __name__ == "__main__":
 
     for row in rows:
-        website = row[config['database']['website_column_name']]
-        manager_email = row[config['database']['manager_email_column_name']]
+        website_column = config['database']['website_column_name']
+        manager_email = config['database']['manager_email_column_name']
+        website = row[str(website_column)]
+        manager_email = row[str(manager_email)]
         status_and_load_time = check_website_status_and_load_time(website)
         status = status_and_load_time['status']
         load_time = status_and_load_time['load_time']
         subject = 'Website status and load time for {} '.format(website)
         _table_row = table_row.format(website, status, load_time)
         all_table_rows += _table_row
-        body = template.format(style, manager_email, _table_row)
+        body = template.format(style, manager_email, _table_row, logo, company_name)
         send_email(manager_email, subject, body)
+    conn.close()
 
     # Send Email to admins
     for email in admin_emails:
         print("Sending Email to admin")
-        send_email(email, 'All Website Status', template.format(style, email, all_table_rows))
+        send_email(email, 'All Website Status', template.format(style, email, all_table_rows, logo, company_name))

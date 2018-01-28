@@ -13,5 +13,7 @@
     "table_name": "website",
     "manager_email_column_name": "manager_email",
     "website_column_name": "website_url"
-  }
+  },
+  "logo": "logo.png",
+  "company_name": "company name"
 }
