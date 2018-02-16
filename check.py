@@ -1,5 +1,6 @@
 import json
 import sqlite3
+from collections import defaultdict
 from email.mime.image import MIMEImage
 
 import requests
@@ -126,21 +127,29 @@ def send_email(recp, subject, body):
 
 if __name__ == "__main__":
 
+    managers_dict = defaultdict(list)
     for row in rows:
         website_column = config['database']['website_column_name']
         manager_email = config['database']['manager_email_column_name']
         website = row[str(website_column)]
         manager_email = row[str(manager_email)]
-        status_and_load_time = check_website_status_and_load_time(website)
-        status = status_and_load_time['status']
-        load_time = status_and_load_time['load_time']
-        subject = 'Website status and load time for {} '.format(website)
-        _table_row = table_row.format(website, status, load_time)
-        all_table_rows += _table_row
-        body = template.format(style, manager_email, _table_row, logo, company_name)
-        send_email(manager_email, subject, body)
-    conn.close()
 
+        managers_dict[manager_email].append(website)
+
+    subject = config['gmail']['subject']
+    for k, v in managers_dict.items():
+        my_table_rows = ''
+        for website in v:
+            status_and_load_time = check_website_status_and_load_time(website)
+            status = status_and_load_time['status']
+            load_time = status_and_load_time['load_time']
+            _table_row = table_row.format(website, status, load_time)
+            my_table_rows += _table_row
+            all_table_rows += _table_row
+        body = template.format(style, k, my_table_rows, logo, company_name)
+        send_email(k, subject, body)
+        my_table_rows = ''
+    conn.close()
     # Send Email to admins
     for email in admin_emails:
         print("Sending Email to admin")

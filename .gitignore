@@ -104,3 +104,4 @@ notebook/
 config.json
 web.sqlite3
 web.db
+test1.db
