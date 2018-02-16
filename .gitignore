@@ -103,3 +103,4 @@ notebook/
 .idea/
 config.json
 web.sqlite3
+web.db
